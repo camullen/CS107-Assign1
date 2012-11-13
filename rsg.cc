@@ -93,11 +93,15 @@ string expandDefinition(Definition& def, map<string, Definition>& grammar){
 }
 
 
-void recursiveExpandDef(Definition& def, map<string, Definition>& grammar, vector<string> builder){
+void recursiveExpandDef(Definition& def, map<string, Definition>& grammar, vector<string>& builder){
   Production prod = def.getRandomProduction();
   for (Production::iterator curr = prod.begin(); curr != prod.end(); ++curr){
     if(isNonTerminal(*curr){
-	grammar
+	map<string, Definition>::iterator found = grammar.find(*curr);
+	assert(found != grammar.end());
+	recursiveExpandDef(found->second, grammar, builder);
+      } else {
+	builder.push_back(*curr)
       }
 
   }
