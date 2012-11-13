@@ -10,14 +10,15 @@
 #include <map>
 #include <fstream>
 #include <vector>
+#include <cassert>
 #include "definition.h"
 #include "production.h"
 using namespace std;
 
 string expandDefinition(Definition& def, map<string, Definition>& grammar);
-bool isNonTerminal(string str);
-void recursiveExpandDef(Definition& def, map<string, Definition>& grammar, vector<string> builder);
-string expandWordVector(const Vector<string>& builder);
+bool isNonTerminal(const string& str);
+void recursiveExpandDef(Definition& def, map<string, Definition>& grammar, vector<string>& builder);
+string expandWordVector(const vector<string>& builder);
 
 /**
  * Takes a reference to a legitimate infile (one that's been set up
@@ -86,9 +87,9 @@ int main(int argc, char *argv[])
 
 
 string expandDefinition(Definition& def, map<string, Definition>& grammar){
-  vector<string> builder = new vector<string>();
-  recursiveExpandDef(def, grammar, builder);
-  String returnString = expandWordVector(builder);
+  vector<string> * builder = new vector<string>();
+  recursiveExpandDef(def, grammar, *builder);
+  string returnString = expandWordVector(*builder);
 
   delete builder;
   return "";
@@ -106,12 +107,12 @@ string expandDefinition(Definition& def, map<string, Definition>& grammar){
 void recursiveExpandDef(Definition& def, map<string, Definition>& grammar, vector<string>& builder){
   Production prod = def.getRandomProduction();
   for (Production::iterator curr = prod.begin(); curr != prod.end(); ++curr){
-    if(isNonTerminal(*curr){
+    if(isNonTerminal(*curr)){
 	map<string, Definition>::iterator found = grammar.find(*curr);
 	assert(found != grammar.end());
 	recursiveExpandDef(found->second, grammar, builder);
       } else {
-	builder.push_back(*curr)
+      builder.push_back(*curr);
       }
 
   }
@@ -124,13 +125,13 @@ void recursiveExpandDef(Definition& def, map<string, Definition>& grammar, vecto
    */
 
 bool isNonTerminal(const string& str){
-  return str[0] == '<' && str[str.length - 1] == '>';
+  return str[0] == '<' && str[str.length() - 1] == '>';
 }
 
- string expandWordVector(const Vector<string>& builder){
+string expandWordVector(const vector<string>& builder){
    string builderString = "";
-   for (string s : builder){
-     builderString = builderString + " " + s;
+   for (size_t i = 0; i < builder.size(); i++){
+     builderString = builderString + " " + builder[i];
    }
    return builderString;
- }
+}
