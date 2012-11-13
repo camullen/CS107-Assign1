@@ -111,5 +111,3 @@ bool isNonTerminal(const string& str){
   return str[0] == '<' && str[str.length - 1] == '>';
 }
 
-//test comment
-
