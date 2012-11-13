@@ -15,10 +15,14 @@
 #include "production.h"
 using namespace std;
 
-string expandDefinition(Definition& def, map<string, Definition>& grammar);
+
+static const size_t LINE_MAX_CHARS = 30;
+
+string expandDefinition(string definitionTitle, map<string, Definition>& grammar);
 bool isNonTerminal(const string& str);
 void recursiveExpandDef(Definition& def, map<string, Definition>& grammar, vector<string>& builder);
 string expandWordVector(const vector<string>& builder);
+void runExpansion(map<string, Definition>& grammar);
 
 /**
  * Takes a reference to a legitimate infile (one that's been set up
@@ -81,18 +85,23 @@ int main(int argc, char *argv[])
   readGrammar(grammarFile, grammar);
   cout << "The grammar file called \"" << argv[1] << "\" contains "
        << grammar.size() << " definitions." << endl;
-  
+  runExpansion(grammar);
   return 0;
 }
 
+void runExpansion(map<string, Definition>& grammar){
+  string expansion = expandDefinition("<start>", grammar);
+  cout << expansion << endl;
+}
 
-string expandDefinition(Definition& def, map<string, Definition>& grammar){
-  vector<string> * builder = new vector<string>();
-  recursiveExpandDef(def, grammar, *builder);
-  string returnString = expandWordVector(*builder);
-
-  delete builder;
-  return "";
+string expandDefinition(string definitionTitle, map<string, Definition>& grammar){
+  map<string, Definition>::iterator start = grammar.find(definitionTitle);
+  assert(start != grammar.end());
+  Definition def = start->second;
+  vector<string> builder = vector<string>();
+  recursiveExpandDef(def, grammar, builder);
+  string returnString = expandWordVector(builder);
+  return returnString;
 }
 
 
@@ -129,9 +138,15 @@ bool isNonTerminal(const string& str){
 }
 
 string expandWordVector(const vector<string>& builder){
-   string builderString = "";
-   for (size_t i = 0; i < builder.size(); i++){
-     builderString = builderString + " " + builder[i];
-   }
-   return builderString;
+  string lineBuilder = "";
+  string builderString = "";
+  for (size_t i = 0; i < builder.size(); i++){
+    if(lineBuilder.length() + builder[i].length() > LINE_MAX_CHARS){
+       builderString = builderString + "\n" + lineBuilder;
+       lineBuilder = "";
+     }
+    lineBuilder = lineBuilder + " " + builder[i];
+  }
+  builderString = builderString + lineBuilder;
+  return builderString;
 }
