@@ -9,6 +9,7 @@
  
 #include <map>
 #include <fstream>
+#include <vector>
 #include "definition.h"
 #include "production.h"
 using namespace std;
@@ -16,6 +17,7 @@ using namespace std;
 string expandDefinition(Definition& def, map<string, Definition>& grammar);
 bool isNonTerminal(string str);
 void recursiveExpandDef(Definition& def, map<string, Definition>& grammar, vector<string> builder);
+string expandWordVector(const Vector<string>& builder);
 
 /**
  * Takes a reference to a legitimate infile (one that's been set up
@@ -86,12 +88,20 @@ int main(int argc, char *argv[])
 string expandDefinition(Definition& def, map<string, Definition>& grammar){
   vector<string> builder = new vector<string>();
   recursiveExpandDef(def, grammar, builder);
-
+  String returnString = expandWordVector(builder);
 
   delete builder;
   return "";
 }
 
+
+/**
+ * Recursively expands a definition and adds the string entries to a vector
+ * @param def The definition to be expanded
+ * @param grammar The grammar of which the definition is a member
+ * @param builder The vector to which the strings should be added
+ *
+ */
 
 void recursiveExpandDef(Definition& def, map<string, Definition>& grammar, vector<string>& builder){
   Production prod = def.getRandomProduction();
@@ -107,7 +117,20 @@ void recursiveExpandDef(Definition& def, map<string, Definition>& grammar, vecto
   }
 }
 
+  /**
+   * returns whether the entry in a given definition is non-terminal
+   *
+   *
+   */
+
 bool isNonTerminal(const string& str){
   return str[0] == '<' && str[str.length - 1] == '>';
 }
 
+ string expandWordVector(const Vector<string>& builder){
+   string builderString = "";
+   for (string s : builder){
+     builderString = builderString + " " + s;
+   }
+   return builderString;
+ }
