@@ -18,12 +18,15 @@ using namespace std;
 
 static const size_t LINE_MAX_CHARS = 70;
 static const size_t NUM_VERSIONS = 3;
+static const string PUNCT_MARKS[] = {".", ",", "!", "?", ";" ":"};
+
 
 string expandDefinition(string definitionTitle, map<string, Definition>& grammar);
 bool isNonTerminal(const string& str);
 void recursiveExpandDef(Definition& def, map<string, Definition>& grammar, vector<string>& builder);
 string expandWordVector(const vector<string>& builder);
 void runExpansion(map<string, Definition>& grammar);
+bool isPunctuation(const string & str);
 
 /**
  * Takes a reference to a legitimate infile (one that's been set up
@@ -152,8 +155,17 @@ string expandWordVector(const vector<string>& builder){
        builderString = builderString + "\n" + lineBuilder;
        lineBuilder = "";
      }
-    lineBuilder = lineBuilder + " " + builder[i];
+    string spacer = " ";
+    if (isPunctuation(builder[i])) spacer = "";
+    lineBuilder = lineBuilder + spacer + builder[i];
   }
   builderString = builderString + "\n" + lineBuilder;
   return builderString;
+}
+
+bool isPunctuation(const string & str){
+  for(size_t i = 0; i < sizeof(PUNCT_MARKS) / sizeof(PUNCT_MARKS[0]); i++){
+      if(str.compare(PUNCT_MARKS[i]) == 0) return true;
+    }
+    return false;
 }
