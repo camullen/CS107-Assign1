@@ -16,7 +16,8 @@
 using namespace std;
 
 
-static const size_t LINE_MAX_CHARS = 30;
+static const size_t LINE_MAX_CHARS = 70;
+static const size_t NUM_VERSIONS = 3;
 
 string expandDefinition(string definitionTitle, map<string, Definition>& grammar);
 bool isNonTerminal(const string& str);
@@ -85,7 +86,14 @@ int main(int argc, char *argv[])
   readGrammar(grammarFile, grammar);
   cout << "The grammar file called \"" << argv[1] << "\" contains "
        << grammar.size() << " definitions." << endl;
-  runExpansion(grammar);
+  
+  for(size_t i = 1; i <= NUM_VERSIONS; i++){
+    cout << "Version #" << i << ": ";
+    for (size_t j = 0; j < LINE_MAX_CHARS - 11; j++) cout << "-";
+    cout << endl;
+    runExpansion(grammar);
+    cout << endl << endl;
+  }
   return 0;
 }
 
@@ -123,7 +131,6 @@ void recursiveExpandDef(Definition& def, map<string, Definition>& grammar, vecto
       } else {
       builder.push_back(*curr);
       }
-
   }
 }
 
@@ -147,6 +154,6 @@ string expandWordVector(const vector<string>& builder){
      }
     lineBuilder = lineBuilder + " " + builder[i];
   }
-  builderString = builderString + lineBuilder;
+  builderString = builderString + "\n" + lineBuilder;
   return builderString;
 }
